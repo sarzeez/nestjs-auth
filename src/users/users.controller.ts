@@ -1,7 +1,14 @@
-import { Controller } from '@nestjs/common';
-import { AuthService } from 'src/auth/auth.service';
+import { Body, Controller, Get, Request } from '@nestjs/common';
 
-@Controller()
+@Controller('users')
 export class UsersController {
-  constructor(private authService: AuthService) {}
+  @Get('me')
+  getMe(@Request() req) {
+    return req.user;
+  }
+
+  @Get('/profile')
+  getProfile(@Body() userDetails: any) {
+    return userDetails;
+  }
 }
