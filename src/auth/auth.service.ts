@@ -1,27 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from 'src/users/types/user';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
-  ) {}
-  async validateUser(username: string, pass: string): Promise<any> {
-    const user = await this.usersService.findOne(username);
-    if (user && user.password === pass) {
+  constructor(private usersService: UsersService, private jwtService: JwtService) {}
+  async validateUser(email: string, pass: string): Promise<JwtPayload> {
+    const userDB = await this.usersService.findUserByEmail(email);
+    if (userDB && userDB.password === pass) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...result } = user;
+      const { password, createdAt, ...result } = userDB;
       return result;
     }
     return null;
   }
 
-  async login(user: any) {
-    const payload = { username: user.username, sub: user.userId };
+  async login(user: JwtPayload) {
+    const payload = { id: user.id, username: user.username, email: user.email, role: user.role };
     return {
-      access_token: this.jwtService.sign(payload),
+      accessToken: this.jwtService.sign(payload),
     };
   }
 }
