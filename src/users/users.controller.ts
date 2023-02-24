@@ -17,7 +17,7 @@ import { JwtService } from '@nestjs/jwt';
 import { pick } from 'lodash';
 import { Public } from 'src/auth/public.decorator';
 import { ConfirmationPurpose } from 'src/entities/user';
-import { encryptPassword } from 'src/utils/bcrypt';
+import { encryptPassword } from 'src/uitls/bcrypt';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { JwtPayload } from './types/user';
 import { UsersService } from './users.service';
