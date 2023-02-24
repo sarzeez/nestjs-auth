@@ -15,7 +15,7 @@ import { AuthController } from './auth.controller';
       useFactory: async () => {
         return {
           secret: process.env.DATABASE_USER,
-          signOptions: { expiresIn: '180s' },
+          signOptions: { expiresIn: '1d' },
         };
       },
     }),

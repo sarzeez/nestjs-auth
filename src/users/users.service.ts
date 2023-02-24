@@ -1,31 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from 'src/entities/user';
-import { CreateUserDetails } from './types/user';
-
-export type CustomUser = any;
+import { ConfirmationPurpose, User } from 'src/entities/user';
+import { CreateUserDetails, UpdateUserDetails } from './types/user';
 
 @Injectable()
 export class UsersService {
-  private readonly users = [
-    {
-      userId: 1,
-      username: 'sarzeez',
-      password: '123456',
-    },
-    {
-      userId: 2,
-      username: 'maria',
-      password: 'guess',
-    },
-  ];
-
   constructor(@InjectRepository(User) private userRepository: Repository<User>) {}
-
-  async findOne(username: string): Promise<CustomUser | undefined> {
-    return this.users.find((user) => user.username === username);
-  }
 
   async createUser(userDetails: CreateUserDetails): Promise<void> {
     const user = this.userRepository.create({ ...userDetails, createdAt: new Date() });
@@ -34,5 +15,20 @@ export class UsersService {
 
   findUserByEmail(email: string): Promise<User> {
     return this.userRepository.findOneBy({ email });
+  }
+
+  async activeUser(email: string): Promise<void> {
+    await this.userRepository.update(
+      { email },
+      { isActive: true, confirmationPurpose: ConfirmationPurpose.DEFAULT, confirmationToken: '' },
+    );
+  }
+
+  async updateUser(id: number, updateUserDetails: UpdateUserDetails): Promise<void> {
+    await this.userRepository.update({ id }, { ...updateUserDetails });
+  }
+
+  async deleteUser(id: number): Promise<void> {
+    await this.userRepository.update({ id }, { isDeleted: true });
   }
 }
