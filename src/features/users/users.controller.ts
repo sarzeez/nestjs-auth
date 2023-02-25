@@ -10,14 +10,13 @@ import {
   Put,
   Request,
   UnauthorizedException,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { pick } from 'lodash';
 import { Public } from 'src/auth/public.decorator';
 import { ConfirmationPurpose } from 'src/entities/user';
 import { encryptPassword } from 'src/uitls/bcrypt';
+import { CreateUserPofileDto, UpdateUserPofileDto } from './dto/profile.dto';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { JwtPayload } from './types/user';
 import { UsersService } from './users.service';
@@ -30,13 +29,20 @@ export class UsersController {
   async getMe(@Request() req) {
     const user: JwtPayload = req.user;
     const userDB = await this.userService.findUserByEmail(user.email);
-    const result = pick(userDB, ['id', 'username', 'email', 'role', 'createdAt', 'isActive']);
+    const result = pick(userDB, [
+      'id',
+      'username',
+      'email',
+      'role',
+      'createdAt',
+      'isActive',
+      'profile',
+    ]);
     return result;
   }
 
   @Post()
   @Public()
-  @UsePipes(new ValidationPipe())
   async createUser(@Body() createUserDto: CreateUserDto) {
     const { email, password } = createUserDto;
     const user = await this.userService.findUserByEmail(email);
@@ -63,7 +69,6 @@ export class UsersController {
   }
 
   @Put()
-  @UsePipes(new ValidationPipe())
   async updateUser(@Request() req, @Body() updateUserDto: UpdateUserDto) {
     const { username } = updateUserDto;
     const jwtPayload = req.user;
@@ -104,9 +109,29 @@ export class UsersController {
   }
 
   @Delete()
-  @UsePipes(new ValidationPipe())
   async deleteUser(@Request() req) {
     const jwtPayload: JwtPayload = req.user;
     await this.userService.deleteUser(jwtPayload.id);
+  }
+
+  // profile
+  @Post('profile')
+  async createUserProfile(@Request() req, @Body() createUserProfileDto: CreateUserPofileDto) {
+    const jwtPayload: JwtPayload = req.user;
+    const user = await this.userService.findUserByEmail(jwtPayload.email);
+    if (user) {
+      throw new ForbiddenException();
+    }
+    const newUserProfile = await this.userService.createUserProfile(
+      jwtPayload.id,
+      createUserProfileDto,
+    );
+    return newUserProfile;
+  }
+
+  @Put('profile')
+  async updateUserProfile(@Request() req, @Body() updateUserProfile: UpdateUserPofileDto) {
+    const jwtPayload: JwtPayload = req.user;
+    await this.userService.updateUserProfile(jwtPayload.id, updateUserProfile);
   }
 }

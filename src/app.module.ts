@@ -4,8 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { Profile } from './entities/profile';
 import { User } from './entities/user';
-import { UsersModule } from './users/users.module';
+import { UsersModule } from './features/users/users.module';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { UsersModule } from './users/users.module';
       username: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE_NAME,
-      entities: [User],
+      entities: [User, Profile],
       synchronize: true,
     }),
   ],
