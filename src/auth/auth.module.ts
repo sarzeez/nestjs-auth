@@ -14,7 +14,7 @@ import { AuthController } from './auth.controller';
     JwtModule.registerAsync({
       useFactory: async () => {
         return {
-          secret: process.env.DATABASE_USER,
+          secret: process.env.JWT_SECRET_KEY,
           signOptions: { expiresIn: '1d' },
         };
       },

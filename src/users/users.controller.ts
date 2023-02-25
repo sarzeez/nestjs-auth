@@ -69,11 +69,7 @@ export class UsersController {
     const jwtPayload = req.user;
     const user = await this.userService.findUserByEmail(jwtPayload.email);
 
-    if (!user) {
-      throw new NotFoundException('User is not found');
-    }
-
-    if (user.isDeleted) {
+    if (!user || user.isDeleted) {
       throw new NotFoundException('User is not found');
     }
 
