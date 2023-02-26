@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
-import { Profile } from './profile';
+import { Client } from './client';
 
 export enum ConfirmationPurpose {
   DEFAULT = '',
@@ -7,7 +7,7 @@ export enum ConfirmationPurpose {
   RESET_PASSWORD_CONFIRMATION = 'reset_password_confirmation',
 }
 
-@Entity({ name: 'users' })
+@Entity({ name: 'user' })
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -44,7 +44,7 @@ export class User {
   @Column({ default: false, name: 'is_deleted' })
   isDeleted: boolean;
 
-  @OneToOne(() => Profile)
-  @JoinColumn({ name: 'profile_id' })
-  profile: Profile;
+  @OneToOne(() => Client)
+  @JoinColumn({ name: 'client_id' })
+  client: Client;
 }

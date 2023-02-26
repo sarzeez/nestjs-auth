@@ -2,16 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfirmationPurpose, User } from 'src/entities/user';
-import { CreateUserDetails, UpdateUserDetails } from './types/user';
-import { Profile } from 'src/entities/profile';
-import { CreateUserProfileDetails, UpdateUserProfileDetails } from './types/profile';
+import { CreateUserDetails, UpdateUserDetails } from '../../types/user';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
-    @InjectRepository(Profile) private profileRepository: Repository<Profile>,
-  ) {}
+  constructor(@InjectRepository(User) private userRepository: Repository<User>) {}
 
   async createUser(userDetails: CreateUserDetails): Promise<void> {
     const user = this.userRepository.create({ ...userDetails, createdAt: new Date() });
@@ -23,7 +18,7 @@ export class UsersService {
       where: {
         email,
       },
-      relations: ['profile'],
+      relations: ['client'],
     });
   }
 
@@ -42,22 +37,7 @@ export class UsersService {
     await this.userRepository.update({ id }, { isDeleted: true });
   }
 
-  // profile
-  async createUserProfile(
-    id: number,
-    createUserProfileDetails: CreateUserProfileDetails,
-  ): Promise<User> {
-    const user = await this.userRepository.findOneBy({ id });
-    const newProfile = this.profileRepository.create(createUserProfileDetails);
-    const savedProfile = await this.profileRepository.save(newProfile);
-    user.profile = savedProfile;
-    return this.userRepository.save(user);
-  }
-
-  async updateUserProfile(
-    id: number,
-    updateUserProfileDetails: UpdateUserProfileDetails,
-  ): Promise<void> {
-    await this.profileRepository.update({ id }, { ...updateUserProfileDetails });
+  async deleteUserClient(id: number) {
+    await this.userRepository.update({ id }, { client: null });
   }
 }

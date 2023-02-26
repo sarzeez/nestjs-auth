@@ -10,6 +10,6 @@ async function bootstrap() {
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, forbidUnknownValues: true }),
   );
   app.useGlobalGuards(new JwtAuthGuard(reflector));
-  await app.listen(3000);
+  await app.listen(5001);
 }
 bootstrap();

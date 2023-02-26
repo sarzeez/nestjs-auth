@@ -16,9 +16,8 @@ import { pick } from 'lodash';
 import { Public } from 'src/auth/public.decorator';
 import { ConfirmationPurpose } from 'src/entities/user';
 import { encryptPassword } from 'src/uitls/bcrypt';
-import { CreateUserPofileDto, UpdateUserPofileDto } from './dto/profile.dto';
-import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
-import { JwtPayload } from './types/user';
+import { CreateUserDto, UpdateUserDto } from '../../dtos/user.dto';
+import { JwtPayload } from '../../types/user';
 import { UsersService } from './users.service';
 
 @Controller('user')
@@ -36,7 +35,7 @@ export class UsersController {
       'role',
       'createdAt',
       'isActive',
-      'profile',
+      'client',
     ]);
     return result;
   }
@@ -112,26 +111,5 @@ export class UsersController {
   async deleteUser(@Request() req) {
     const jwtPayload: JwtPayload = req.user;
     await this.userService.deleteUser(jwtPayload.id);
-  }
-
-  // profile
-  @Post('profile')
-  async createUserProfile(@Request() req, @Body() createUserProfileDto: CreateUserPofileDto) {
-    const jwtPayload: JwtPayload = req.user;
-    const user = await this.userService.findUserByEmail(jwtPayload.email);
-    if (user) {
-      throw new ForbiddenException();
-    }
-    const newUserProfile = await this.userService.createUserProfile(
-      jwtPayload.id,
-      createUserProfileDto,
-    );
-    return newUserProfile;
-  }
-
-  @Put('profile')
-  async updateUserProfile(@Request() req, @Body() updateUserProfile: UpdateUserPofileDto) {
-    const jwtPayload: JwtPayload = req.user;
-    await this.userService.updateUserProfile(jwtPayload.id, updateUserProfile);
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from 'src/features/users/types/user';
+import { JwtPayload } from 'src/types/user';
 import { UsersService } from 'src/features/users/users.service';
 import { comparePasswords } from 'src/uitls/bcrypt';
 
