@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
+import { Client } from './client';
 
 export enum ConfirmationPurpose {
   DEFAULT = '',
@@ -6,7 +7,7 @@ export enum ConfirmationPurpose {
   RESET_PASSWORD_CONFIRMATION = 'reset_password_confirmation',
 }
 
-@Entity()
+@Entity({ name: 'user' })
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -23,22 +24,27 @@ export class User {
   @Column({ default: 'admin' })
   role: string;
 
-  @Column()
+  @Column({ name: 'created_at' })
   createdAt: Date;
 
-  @Column({ default: false })
+  @Column({ default: false, name: 'is_active' })
   isActive: boolean;
 
   @Column({
     type: 'enum',
     enum: ConfirmationPurpose,
     default: ConfirmationPurpose.DEFAULT,
+    name: 'confirmation_purpose',
   })
   confirmationPurpose: ConfirmationPurpose;
 
-  @Column()
+  @Column({ name: 'confirmation_token' })
   confirmationToken: string;
 
-  @Column({ default: false })
+  @Column({ default: false, name: 'is_deleted' })
   isDeleted: boolean;
+
+  @OneToOne(() => Client)
+  @JoinColumn({ name: 'client_id' })
+  client: Client;
 }

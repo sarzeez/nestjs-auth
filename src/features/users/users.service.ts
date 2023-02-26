@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfirmationPurpose, User } from 'src/entities/user';
-import { CreateUserDetails, UpdateUserDetails } from './types/user';
+import { CreateUserDetails, UpdateUserDetails } from '../../types/user';
 
 @Injectable()
 export class UsersService {
@@ -14,7 +14,12 @@ export class UsersService {
   }
 
   findUserByEmail(email: string): Promise<User> {
-    return this.userRepository.findOneBy({ email });
+    return this.userRepository.findOne({
+      where: {
+        email,
+      },
+      relations: ['client'],
+    });
   }
 
   async activeUser(email: string): Promise<void> {
@@ -30,5 +35,9 @@ export class UsersService {
 
   async deleteUser(id: number): Promise<void> {
     await this.userRepository.update({ id }, { isDeleted: true });
+  }
+
+  async deleteUserClient(id: number) {
+    await this.userRepository.update({ id }, { client: null });
   }
 }

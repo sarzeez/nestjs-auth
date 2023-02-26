@@ -10,16 +10,14 @@ import {
   Put,
   Request,
   UnauthorizedException,
-  UsePipes,
-  ValidationPipe,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { pick } from 'lodash';
 import { Public } from 'src/auth/public.decorator';
 import { ConfirmationPurpose } from 'src/entities/user';
 import { encryptPassword } from 'src/uitls/bcrypt';
-import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
-import { JwtPayload } from './types/user';
+import { CreateUserDto, UpdateUserDto } from '../../dtos/user.dto';
+import { JwtPayload } from '../../types/user';
 import { UsersService } from './users.service';
 
 @Controller('user')
@@ -30,13 +28,20 @@ export class UsersController {
   async getMe(@Request() req) {
     const user: JwtPayload = req.user;
     const userDB = await this.userService.findUserByEmail(user.email);
-    const result = pick(userDB, ['id', 'username', 'email', 'role', 'createdAt', 'isActive']);
+    const result = pick(userDB, [
+      'id',
+      'username',
+      'email',
+      'role',
+      'createdAt',
+      'isActive',
+      'client',
+    ]);
     return result;
   }
 
   @Post()
   @Public()
-  @UsePipes(new ValidationPipe())
   async createUser(@Body() createUserDto: CreateUserDto) {
     const { email, password } = createUserDto;
     const user = await this.userService.findUserByEmail(email);
@@ -63,7 +68,6 @@ export class UsersController {
   }
 
   @Put()
-  @UsePipes(new ValidationPipe())
   async updateUser(@Request() req, @Body() updateUserDto: UpdateUserDto) {
     const { username } = updateUserDto;
     const jwtPayload = req.user;
@@ -104,7 +108,6 @@ export class UsersController {
   }
 
   @Delete()
-  @UsePipes(new ValidationPipe())
   async deleteUser(@Request() req) {
     const jwtPayload: JwtPayload = req.user;
     await this.userService.deleteUser(jwtPayload.id);
